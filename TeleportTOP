@@ -1,0 +1,63 @@
+-- Create a ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "CustomGui"
+gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create a Frame to hold the buttons
+local frame = Instance.new("Frame")
+frame.Name = "DraggableFrame"
+frame.Size = UDim2.new(0.2, 0, 0.1, 0) -- Size of the frame relative to the screen
+frame.Position = UDim2.new(0.4, 0, 0.4, 0) -- Position of the frame relative to the screen
+frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White background
+frame.BorderSizePixel = 0 -- No border
+frame.Active = true -- Allow the frame to capture input events
+frame.Parent = gui
+
+-- Function to make the frame draggable
+local dragStart = nil
+local startPos = nil
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragStart = nil
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragStart then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Create the first button
+local button1 = Instance.new("TextButton")
+button1.Text = "Teleport"
+button1.Size = UDim2.new(0.8, 0, 0.8, 0) -- Size of the button relative to the frame
+button1.Position = UDim2.new(0.1, 0, 0.1, 0) -- Position of the button relative to the frame
+button1.BackgroundColor3 = Color3.fromRGB(100, 100, 255) -- Blue background
+button1.Parent = frame
+
+-- Add a function to execute when button1 is clicked
+button1.MouseButton1Click:Connect(function()
+    -- This code is specifically for Codex Executor
+    -- Function to teleport the player to the FinishGlow part after a delay
+    local function teleportToFinishGlow()
+        local finishGlow = game:GetService("Workspace").tower.sections.finish.FinishGlow
+        if finishGlow then
+            wait(2) -- Delay before teleporting (adjust as needed)
+            game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(finishGlow.CFrame)
+        else
+            print("FinishGlow part not found!")
+        end
+    end
+
+    -- Call the function to teleport the player
+    teleportToFinishGlow()
+end)
